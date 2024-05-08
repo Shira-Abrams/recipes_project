@@ -7,7 +7,11 @@
 const express=require('express')
 const morgan = require('morgan');
 const cors=require('cors')
+ const userRouter=require('./routes/user.route')
+ const recipesRouter=require('./routes/recipe.route')
+ const categoriesRouter=require('./routes/categories.route')
 
+const {pageNotFound,serverErrors}= require('./middlewares/handleErrors')
 require('dotenv').config();
 require('./config/db')
 
@@ -18,6 +22,12 @@ app.use(morgan('dev'))
 app.use(cors())
 
 
+app.use('/users',userRouter);
+app.use('/recepesRouter',recipesRouter);
+app.use('/categories',categoriesRouter)
+
+app.use(pageNotFound);
+app.use(serverErrors);
 const port=process.env.PORT;
 app.listen(port ,()=>{
     console.log("running at http://localhost:" + port);
