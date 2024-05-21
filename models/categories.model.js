@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
-const {} =require('./recipe.model')
-const  categoriesSchema= new mongoose.Schema({
-    code:{type:Number},
-    description:{type:String},
-    recipes:[{type:mongoose.Types.ObjectId,ref:'user'}]
-})
+const {Recipes} =require('./recipe.model');
+const joi = require('joi');
 
-moudule.exports.Categories.model('categories',categoriesSchema)
+const recipesMiniSchema=new mongoose.Schema({
+    name:{type:String},
+    ImageUrl:{type:String},
+    _id:{type:mongoose.Types.ObjectId,ref:'recipes'}//??
+});
+const  categoriesSchema= new mongoose.Schema({
+    description:{type:String},
+    recipes:[recipesMiniSchema]//
+});
+
+module.exports.Categories=mongoose.model('categories',categoriesSchema)

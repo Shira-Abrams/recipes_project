@@ -23,7 +23,7 @@ app.use(cors())
 
 
 app.use('/users',userRouter);
-app.use('/recepesRouter',recipesRouter);
+app.use('/recipes',recipesRouter);
 app.use('/categories',categoriesRouter)
 
 app.use(pageNotFound);

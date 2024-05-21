@@ -8,16 +8,17 @@ const jwt=require('jsonwebtoken');
 const userSchema=new mongoose.Schema(
     {
         username:{type:String,required:true},
-        password:{type:String,uniqe:true,minlength:[8,'password must contain at least 3 '],match:/(?=.*[a-zA-Z])(?=.*\d)/},
-        email:{type:String,uniqe:true},
+        password:{type:String,unique:true,minlength:[8,'password must contain at least 8'],match:/(?=.*[a-zA-Z])(?=.*\d)/,required:true},
+        email:{type:String,unique:true},
         addres:{type:String},
-        role:{type:String,default:'user', enum:['admin','user']}
+        role:{type:String,default:'user', enum:['admin','user','registered user']}
+        
     }
 )
 //hashing the password before saving in the db
 userSchema.pre('save',function(next){
-   const salt=process.env.BCRYPT_SALT
-   bcrypt.hash(this.password,salt,async(err,hashPassword)=>{
+   const salt=+process.env.BCRYPT_SALT|10
+   bcrypt.hash(this.password,10,async(err,hashPassword)=>{
     if(err)
         throw new Error(err.message)
     this.password=hashPassword;
@@ -28,13 +29,15 @@ userSchema.pre('save',function(next){
 //validation schema
 module.exports.userValidator={
     logInSchema:Joi.object({
-        email:Joi.string().email({min:2,tlds:{allow:['come','net']}}),
-        password:Joi.string().min(8).max(16).required(),
+         email:Joi.string().email().required(),
+         password:Joi.string().min(8).required(),
     })
 
 }
+
 //generatin the token 
-moudule.exports.generateToken=(user)=>{
+//
+module.exports.generateToken=(user)=>{
     const privateKey=process.env.JWT_SECRET||'JWT_SECRET'//sercret string theat the token generated according to it
     const data={role:user.role,user_id:user.user_id} // the relvent details for the user authantication
     const token=jwt.sign(data,privateKey,{expiresIn:'1h'})//generate the token plus  expiry date
