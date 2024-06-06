@@ -9,9 +9,9 @@ const userSchema=new mongoose.Schema(
     {
         username:{type:String,required:true},
         password:{type:String,unique:true,minlength:[8,'password must contain at least 8'],match:/(?=.*[a-zA-Z])(?=.*\d)/,required:true},
-        email:{type:String,unique:true},
-        addres:{type:String},
-        role:{type:String,default:'user', enum:['admin','user','registered user']}
+        email:{type:String,unique:true,required:true},
+        address:{type:String},
+        role:{type:String,default:'user', enum:['admin','user','registered user'],required:true}
         
     }
 )

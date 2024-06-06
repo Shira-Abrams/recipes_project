@@ -5,6 +5,8 @@ const joi = require('joi');
 const recipesMiniSchema=new mongoose.Schema({
     name:{type:String},
     ImageUrl:{type:String},
+    difficulty:{type:Number,match:[1-5]},
+    preperationTime:{type:Number,required:true},
     _id:{type:mongoose.Types.ObjectId,ref:'recipes'}//??
 });
 const  categoriesSchema= new mongoose.Schema({

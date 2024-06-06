@@ -20,8 +20,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(morgan('dev'))
 app.use(cors())
-
-
 app.use('/users',userRouter);
 app.use('/recipes',recipesRouter);
 app.use('/categories',categoriesRouter)

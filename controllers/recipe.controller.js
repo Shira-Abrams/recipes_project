@@ -3,12 +3,22 @@ const {Categories}=require("../models/categories.model");
 const { default: mongoose } = require("mongoose");
 //#
 exports.getAllRecipes=async(req,res,next)=>{
-  //??האם צריך הרשאות גישה 
+
+    // optional parameters - לא חובה
+    // http://localhost:5000/courses?search=ab&page=1&perPage=3
+    let {search,page,perPage}=req.query;
+    search ??=''
+    page ??=1
+    perPage ??=3
     try {
-      const AllRecipes= await Recipes.find().select('-__v');
+        
+      const AllRecipes= await Recipes.find({name:new RegExp(search)})
+      .skip((page-1)*perPage)
+      .limit(perPage)
+      .select('-__v');
       return res.send(AllRecipes);
     } catch (error) {
-       next({error}) 
+       next(error) 
     }
 
 }
