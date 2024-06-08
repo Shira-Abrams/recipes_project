@@ -1,14 +1,7 @@
 
-//mongodb+srv://sh3000444:27WaemCrR7MHnatW@cluster0.bfaxly7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-//mongodb+srv://sh3000444:<password>@cluster0.bfaxly7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
-
-
 const express=require('express')
 const morgan = require('morgan');
 const cors=require('cors');
-const multer = require('multer');
-const path = require('path');
  const userRouter=require('./routes/user.route')
  const recipesRouter=require('./routes/recipe.route')
  const categoriesRouter=require('./routes/categories.route')

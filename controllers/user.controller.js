@@ -53,9 +53,9 @@ exports.getAllUser=async(req,res,next)=>{
      
     try {
         const user=await User.find().select('-__v');
-        // user.forEach(element => {
-        //     element.password='****'
-        // });
+        user.forEach(element => {
+            element.password='****'
+        });
         console.log('user==',user);
         return res.json(user);
     } catch (error) {

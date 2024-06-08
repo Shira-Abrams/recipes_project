@@ -1,6 +1,6 @@
 const express= require('express');
 const {signIn,signUp,getAllUser}=require('../controllers/user.controller')
-const {auth}=require('../middlewares/auth')
+const {auth}=require('../middlewares/userAuth')
 const router =express.Router();
 //הרשמה
 router.post('/signup',signUp);
