@@ -23,8 +23,8 @@ const recipeSchema=new mongoose.Schema({
 
     description:{type:String},
     categories:[{type:String,required:true}],
-    preperationTime:{type:Number,required:true},
-    difficulty:{type:Number,match:[1-5]},
+    preperationTime:{type:Number},
+    difficulty:{type:Number,min:1,max:5},
     dateAdded:{type:Date, default:new Date()},
     layersArray:[{
         description:{type:String},
@@ -37,4 +37,3 @@ const recipeSchema=new mongoose.Schema({
 })
 
 module.exports.Recipes=mongoose.model('recipes', recipeSchema)
-//module.exports.Categories=mongoose.model('categories',categoriesSchema)
