@@ -97,8 +97,7 @@ exports.addRecipe=async(req,res,next)=>{
                 }
                  console.log(req.file);
                  req.body.imagUrl=req.file.filename;
-                 const recipe=new Recipes(req.body)
-    
+                 const recipe=new Recipes(req.body);
                  recipe.save();
                  const {categories}=req.body;
                  if(categories)
@@ -191,11 +190,17 @@ exports.deleteRecipe=async(req,res,next)=>{
                         {
                             await Categories.findByIdAndDelete(cat._id)
                         }
+                        else{
+                            cat.recipes.filter(x=>x._id!=rec._id)
+                           await cat.save();
+                        }
+
                   }
                    
                         
                             
-                }
+                } 
+            
             await  Recipes.findByIdAndDelete(id)
             return res.status(204).send();
         }

@@ -1,5 +1,5 @@
 const jwt=require('jsonwebtoken')
-exports.auth=(req,res,next)=>{
+exports.userAuth=(req,res,next)=>{
     try {
         const {authorization}=req.headers;//extractin the token form the header
         const [,token]=authorization.split(' ');

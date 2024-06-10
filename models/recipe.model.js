@@ -30,7 +30,15 @@ const recipeSchema=new mongoose.Schema({
         description:{type:String},
         ingredients:[{type:String}]
     }],
-    preperationInstruction:{type:String},
+    preperationInstruction:{
+        type:[String],
+        validate:{
+            validator(v){
+                return v&&v.length>=1;
+            },
+            message:'category mast contain at least one item '
+        }
+    },
     imagUrl:{type:String},
     isPrivate:{type:Boolean},
     user:miniUser
