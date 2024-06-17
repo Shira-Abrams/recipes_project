@@ -3,6 +3,7 @@ const {Categories}=require("../models/categories.model");
 const { default: mongoose } = require("mongoose");
 const multer = require('multer');
 const path = require('path');
+const { error } = require("console");
 //#
 exports.getAllRecipes=async(req,res,next)=>{
 
@@ -92,11 +93,11 @@ exports.addRecipe=async(req,res,next)=>{
         try {
             if(req.user.role=='admin'||req.user.role=="user")
             {   
-                if (!req.file) {
-                    return next({ message: 'No file uploaded!', status: 400 });
+                if (req.file) {
+                    console.log(req.file);
+                    req.body.imagUrl=req.file.filename;
                 }
-                 console.log(req.file);
-                 req.body.imagUrl=req.file.filename;
+                 
                  const recipe=new Recipes(req.body);
                  recipe.save();
                  const {categories}=req.body;
@@ -110,12 +111,14 @@ exports.addRecipe=async(req,res,next)=>{
                               await cat.save();
                           }
                           else{
-             
+                            
                               const mewCategory= new Categories({
                                   description:element,
                                   recipes:{
                                     name:recipe.name,
                                     imagUrl:recipe.imagUrl,
+                                    difficulty:recipe.difficulty,
+                                    preperationTime:recipe.preperationTime,
                                     _id:recipe.id
                                   }
                               }) 
@@ -143,26 +146,107 @@ exports.addRecipe=async(req,res,next)=>{
 }
 //##
 exports.updateRecipes=async(req,res,next)=>{
-    //האם צריך לעדכן קטוגריה ??      
-      const id= req.params.id;
-    if(!mongoose.Types.ObjectId.isValid(id))
-        next({message:'id is not valid'})
-   try {
-    if(req.user.role=='admin'||req.user.role=='registered user'||req.user.role=='user'){
-        const updatedUser= await Recipes.findByIdAndUpdate(
+    upload(req,res,async(error)=>{
+        if (error) {
+            if (err instanceof multer.MulterError) {
+              // A Multer error occurred when uploading.
+               console.log('req file',req.file);
+               console.log(req.body);
+              return res.status(400).json({ message: err });
+            } else {
+              // An unknown error occurred when uploading.
+              return res.status(500).json({ message: err });
+            }
+        }
+
+
+        const id= req.params.id;
+        if(!mongoose.Types.ObjectId.isValid(id))
+            next({message:'id is not valid'})
+       try {
+        if(req.user.role=='admin'||req.user.role=='user'){
+           
+         const  prevRecipe=await Recipes.findById(id)
+           if(!prevRecipe)
+             return next({message:'recipe not found'})
+            if(req.file)
+            {
+                console.log(req.file);
+                req.body.imagUrl=req.file.filename
+            }
+           
+            const updatedRecipe= await Recipes.findByIdAndUpdate(
             id,
             { $set: req.body },
-            {new:true}
-       );
-       return res.json(updatedUser)
-    }
-    else{
-        next({message:' only admin or registered user can add recepie ' ,status:403})
-
-    }
-   } catch (error) {
-      next({message:error.message})
-   }
+            {new:true});
+       
+           const {categories}=req.body;
+           const prevCategory=prevRecipe.categories
+           for(let category of prevCategory){
+            
+            if(!categories.includes(category))
+            {
+               const cat= await Categories.findOne({description:category});
+                if(cat)
+                {  
+    
+                    if(cat.recipes.length==1)
+                     {
+                         await Categories.findByIdAndDelete(cat._id)
+                     }
+                     else{
+                         cat.recipes=cat.recipes.filter(x=>x.id!=id)
+                         await cat.save()
+                     }
+                   
+                }
+                
+            }
+           }
+           for(let element  of categories)
+            {       
+                    const cat= await Categories.findOne({description:element});
+                    if(!cat)
+                    {
+                        const mewCategory= new Categories({
+                            description:element,
+                            recipes:{
+                              name:updatedRecipe.name,
+                              imagUrl:updatedRecipe.imagUrl,
+                              difficulty:updatedRecipe.difficulty,
+                              preperationTime:updatedRecipe.preperationTime,
+                              _id:updatedRecipe.id
+                            }
+                        }) 
+                       await  mewCategory.save();
+                    }
+                    if(cat)
+                    {
+                      let RecipeIndex= cat.recipes.findIndex(x=>x._id==prevRecipe._id) 
+                      cat.recipes[RecipeIndex]={
+                              name:updatedRecipe.name,
+                              imagUrl:updatedRecipe.imagUrl,
+                              difficulty:updatedRecipe.difficulty,
+                              preperationTime:updatedRecipe.preperationTime,
+                              _id:updatedRecipe.id
+                      }
+                    }
+            }
+    
+           
+           return res.json(updatedRecipe)
+        }
+        else{
+            next({message:' only admin or registered user can add recepie ' ,status:403})
+    
+        }
+       } catch (error) {
+          console.log(error);
+          next({message:error.message})
+       }
+        
+    })
+    
 }
 
 
@@ -214,7 +298,7 @@ const storage = multer.diskStorage({
       cb(null, '../recipes_project/images'); // Directory where files will be stored
     },
     filename: (req, file, cb) => {
-        cb(null, file.fieldname + "-" + Date.now() + ".jpg");
+        cb(null, file.originalname + ".jpg");
     }
   });
  const upload = multer({

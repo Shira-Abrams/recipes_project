@@ -15,7 +15,7 @@ exports.getAllCategories=async(req,res,next)=>{
 
 exports.getAllCategoriesAndRecipe=async(req,res,next)=>{
       try {
-       const categoriesAndRecipe=await Categories.find().populate('recipes._id','-__v').select('-__v')
+       const categoriesAndRecipe=await Categories.find().populate('recipes._id').select('-__v')
    
         return res.send(categoriesAndRecipe)
       } catch (error) {
@@ -26,7 +26,7 @@ exports.getAllCategoriesAndRecipe=async(req,res,next)=>{
 exports.getCategoryByIdWithRec=async(req,res,next)=>{
     const id=req.params.id;
 try {
-    const recipesByCategorie =await Categories.findById(id).populate('recipes._id','-__v');
+    const recipesByCategorie =await Categories.findById(id).select('-__v');
     res.send(recipesByCategorie);
 } catch (error) {
     next({message:error.message});
