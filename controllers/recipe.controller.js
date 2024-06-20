@@ -4,6 +4,7 @@ const { default: mongoose } = require("mongoose");
 const multer = require('multer');
 const path = require('path');
 const { error } = require("console");
+const { query } = require("express");
 //#
 exports.getAllRecipes=async(req,res,next)=>{
 
@@ -26,6 +27,7 @@ exports.getAllRecipes=async(req,res,next)=>{
 
 }
 
+
 //#
 exports.getRecipeByCode=async(req,res,next)=>{
     const  id =req.params.id;
@@ -46,10 +48,13 @@ exports.getRecipeByCode=async(req,res,next)=>{
 
 
 exports.getRecipesByUser=async(req,res,next)=>{
-    //לבדוק הראשות גישה למשתמש 
+    let {search}=req.query;
+    search ??=''
+
+    //לבדוק הראשות שה למשתמש 
     const id=req.params.userId;
     try {
-        const userRecipe= await Recipes.find({'user._id':id}).select('-__v') ;
+        const userRecipe= await Recipes.find({ 'user._id':id}).select('-__v');
         console.log('id=' ,id,'user==' ,userRecipe);
         return res.json(userRecipe).status(200);
     } catch (error) {
@@ -223,6 +228,7 @@ exports.updateRecipes=async(req,res,next)=>{
                     if(cat)
                     {
                       let RecipeIndex= cat.recipes.findIndex(x=>x._id==prevRecipe._id) 
+                       console.log('RecipeIndex',RecipeIndex);
                       cat.recipes[RecipeIndex]={
                               name:updatedRecipe.name,
                               imagUrl:updatedRecipe.imagUrl,
@@ -230,6 +236,7 @@ exports.updateRecipes=async(req,res,next)=>{
                               preperationTime:updatedRecipe.preperationTime,
                               _id:updatedRecipe.id
                       }
+                      await  cat.save();
                     }
             }
     
