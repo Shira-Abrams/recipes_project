@@ -15,6 +15,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(morgan('dev'))
 app.use(cors());
+app.get('/',(req,res)=>{
+    res.send('welcome to recipe website')
+});
 app.use('/images', express.static('images'));
 app.use('/users',userRouter);
 app.use('/recipes',recipesRouter);

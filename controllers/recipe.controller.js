@@ -16,7 +16,7 @@ exports.getAllRecipes=async(req,res,next)=>{
     perPage ??=3
     try {
         
-      const AllRecipes= await Recipes.find({name:new RegExp(search)})
+      const AllRecipes= await Recipes.find({name:new RegExp(search),isPrivate:false})
       .skip((page-1)*perPage)
       .limit(perPage)
       .select('-__v');
