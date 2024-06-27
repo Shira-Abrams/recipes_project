@@ -3,7 +3,22 @@ const Joi=require('joi');
 const {User,generateToken, userValidator}=require('../models/user.model')
 //new user singUp -הרשמה 
 exports.signUp=async(req,res,next)=>{
+   
    const {username,email,password,role,addres}=req.body;
+    const ExsistUser= await User.findOne({email:email})
+    console.log('ExsistUser',ExsistUser);
+    if(ExsistUser)
+        return next({message:'cant insert exsist user',status:409});
+       
+    const AllUser=await User.find();
+    for(let u of AllUser) 
+    {
+        let  IsSamePassword=await bcrypt.compare(password,u.password);
+        if(IsSamePassword)
+            return next({message:'cant insert exsist user',status:409});
+
+    } 
+
    try {
     const user=new User({username,email,password,role,addres})
     await user.save();

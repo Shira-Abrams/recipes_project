@@ -6,7 +6,7 @@ exports.adminAuth=(req,res,next)=>{
         const privateKey=process.env.JWT_SECRET||'JWT_SECRET';
         const data=jwt.verify(token,privateKey);
         req.user=data;
-        if(!req.user.role=='admin')
+        if(req.user.role!='admin')
             next({message:'no promission to invoke this function',status:403})
         next()//go the the router middlewares
     } catch (error) {
